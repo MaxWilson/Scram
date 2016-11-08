@@ -1,0 +1,1 @@
+npm run watch && start http://localhost:8080

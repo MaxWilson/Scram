@@ -45,20 +45,36 @@ let addText (stage: Container) msg =
             msg,
             [
             TextStyle.Font "bold italic 24px Arial"
-            TextStyle.Fill (U2.Case1 "#3e1707")
+            TextStyle.Fill (U2.Case1 "orange")
             TextStyle.Align "center"
-            TextStyle.Stroke (U2.Case1 "#a4410e")
+            TextStyle.Stroke (U2.Case1 "blue")
             TextStyle.StrokeThickness 7.
             ], position=Point(randomRational 500., randomRational 500.))
     stage.addChild(text)
     |> ignore
+
+let addSmallText (stage: Container) msg =
+    let colors = ["red";"yellow";"blue";"black"]
+    let text =
+        Fable.Import.PIXI.Text(
+            msg,
+            [
+            TextStyle.Font "bold italic 12px"
+            TextStyle.Fill (U2.Case1 colors.[(random colors.Length)-1])
+            TextStyle.Align "center"
+            TextStyle.Stroke (U2.Case1 colors.[(random colors.Length)-1])
+            TextStyle.StrokeThickness 7.
+            ], position=Point(randomRational 500., randomRational 500.))
+    stage.addChild(text)
+    |> ignore
+
 
 let onStart stage =
     addText stage "Hello"
     ()
 
 let everySecond stage =
-    //addText stage "Hello again!"
+    addSmallText stage "I'm a fish"
     ()
 
 let onClick stage =

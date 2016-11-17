@@ -76,10 +76,11 @@ let onStart (stage: Container) =
         .endFill()
         |> ignore
     stage.addChild(gr) |> ignore
+    for x in top..tilesize..bottom do
+        for y in left..tilesize..right do
+            lava stage x y
     addText stage "Hello" "blue" "red"
     addText stage "World" "orange" "purple"
-    lava stage 330. 220.
-    lava stage (330.+64.) 220.
     ()
 
 let everySecond stage =

@@ -3,16 +3,17 @@
 open System.Collections.Generic
 
 type TerrainType = Lava | Spikes | Ground | Start | Treasure
+type TerrainMap = TerrainType[][]
 let parseMap (input: string) : TerrainType[][] =
     let rows = input.Trim().Split() |> Array.filter (fun x -> x.Length > 0)
     let rows = rows |> Array.map(fun str -> seq { for x in str.Trim() do yield (match x with '^' -> Spikes | '-' -> Lava | 'X' -> Treasure | 'S' -> Start | _ -> Ground) } |> Array.ofSeq)
     rows
 
 let level1 = parseMap """
-    ...^......
+    ...^..^...
     ......-...
     .--.....^^
-    .-^.....^.
+    .-...-..^.
     ...^..^...
     -..---^^^.
     .......-..
@@ -20,6 +21,15 @@ let level1 = parseMap """
     ......--..
     .S.....S..
 """
+
+let mapIndexes (map: TerrainMap) (t: TerrainType) =
+    seq {
+        for x in 0..map.Length - 1 do
+            let row = map.[x]
+            for y in 0..map.Length - 1 do
+                if row.[y] = t then
+                    yield (x,y)
+    }
 
 type Event = Button1 | Button2
 type Location = Frontof of Location | Leftof of Location | Rightof of Location | Backof of Location | Me

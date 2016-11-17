@@ -83,9 +83,9 @@ type Robot(image: string, map: TerrainMap) =
             n <- n'
             updateDest()
     let destinations = [
-        200., 200.
-        500., 200.
-        300., 300.
+        100., 300.
+        600., 200.
+        300., 600.
     ]
     let mutable destIndex = 0
     do
@@ -108,9 +108,10 @@ type Robot(image: string, map: TerrainMap) =
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y
-            let scale n =
-                if n > 10. then 10.
-                elif n < -10. then -10.
-                else n
-            sp.position.x <- sp.position.x + scale distx
-            sp.position.y <- sp.position.y + scale disty
+            let scale a b =
+                let c = sqrt (a*a+b*b)
+                let scalingFactor = 10./c
+                if c > 10. then a * scalingFactor
+                else a
+            sp.position.x <- sp.position.x + scale distx disty
+            sp.position.y <- sp.position.y + scale disty distx

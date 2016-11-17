@@ -19,7 +19,9 @@ open Fable.Import.PIXI
 #endif
 open Utils
 
-let x = random 10
+let tilesize = 64.
+let top,left = 20., 20.
+let bottom,right = 20.+(tilesize*10.),20.+(tilesize*10.)
 
 let rec addUnicorn (container: Container) =
     let p = Sprite.fromImage "https://www.ethereum.org/images/unicorn.png"
@@ -67,7 +69,13 @@ let lava (stage: Container) x y =
     lava.animationSpeed <- 0.2
     stage.addChild(lava) |> ignore
 
-let onStart stage =
+let onStart (stage: Container) =
+    let gr = Graphics()
+    gr.beginFill(float 0xFFFFFF).lineStyle(3., float 0x000000)
+        .drawRect(top, left, bottom-top, right-left)
+        .endFill()
+        |> ignore
+    stage.addChild(gr) |> ignore
     addText stage "Hello" "blue" "red"
     addText stage "World" "orange" "purple"
     lava stage 330. 220.

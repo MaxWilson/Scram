@@ -52,6 +52,6 @@ type DisplayBox() =
 type App() =
     inherit Component<unit, unit>()
     member this.render() =
-        R.div [] [
+        R.div [Style [Height 1000]] [
             R.com<DisplayBox,_,_>()[]
             ]

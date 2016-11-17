@@ -51,14 +51,17 @@ let addText (stage: Container) msg color1 color2 =
     stage.addChild(text)
     |> ignore
 
+let r = Map.Robot("Unicorn.png", Data.level1)
 let onStart (stage: Container) =
     Map.renderLevel stage Data.level1
     addText stage "Hello" "blue" "red"
     addText stage "World" "orange" "purple"
+    r.PlaceOnMap(stage)
     ()
 
 let everySecond stage =
     //addText stage "Hello again!"
+    r.Update()
     ()
 
 let onClick stage =

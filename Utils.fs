@@ -13,3 +13,6 @@ let random(n:int) =
 let randomRational(n:float) =
     let r = new Random();
     r.NextDouble() * n
+
+let randomPick (vals: 't list) =
+    vals.[(random vals.Length) - 1]

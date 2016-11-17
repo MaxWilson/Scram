@@ -13,6 +13,10 @@ let tilesize = 64.
 let top,left = 20., 20.
 let bottom,right = 20.+(tilesize*10.),20.+(tilesize*10.)
 
+type MoveableSprite() =
+    inherit Sprite()
+    member val xdest = (0.) with get, set
+    member val ydest = (0.) with get, set
 
 let makeAnimation(url, size: int, spritecoords: (int * int) list) =
     let texture = Texture.fromImage(url)
@@ -42,22 +46,62 @@ let spikes (stage: Container) (x, y) =
     stage.addChild(s)
     |> ignore
 
-let renderLevel (stage: Container) (level : Data.TerrainType[][]) =
+let mutable currentLevel : TerrainMap = Unchecked.defaultof<TerrainMap>
+
+let renderLevel (stage: Container) (level : TerrainMap) =
     let gr = Graphics()
     gr.beginFill(float 0xFFFFFF).lineStyle(3., float 0x000000)
         .drawRect(top, left, bottom-top, right-left)
         .endFill()
         |> ignore
     stage.addChild(gr) |> ignore
-    for x in 0..level.Length - 1 do
-        let row = level.[x]
-        for y in 0..row.Length - 1 do
+    for m in 0..level.Length - 1 do
+        let row = level.[m]
+        for n in 0..row.Length - 1 do
             // convert x, y to pixels
-            let coords = top + (float x * tilesize), left + (float y * tilesize)
-            match row.[y] with
+            let coords = top + (float n * tilesize), left + (float m * tilesize)
+            match row.[n] with
             | TerrainType.Lava ->
                 lava stage coords
             | TerrainType.Spikes ->
                 spikes stage coords
             | _ ->
                 ground stage coords
+
+type Robot(image: string, map: TerrainMap) =
+    let legalStarts = mapIndexes map Start |> List.ofSeq
+    let mutable m = -1
+    let mutable n = -1
+    let sp = Sprite.fromImage(image) |> unbox<MoveableSprite>
+    let updateDest() =
+        sp.ydest <- top + (float n * tilesize) + 32.
+        sp.xdest <- left + (float m * tilesize) + 32.
+    let place() =
+        if m < 0 && n < 0 then
+            let m', n' = randomPick legalStarts
+            m <- m'
+            n <- n'
+            updateDest()
+    do
+        sp.anchor <- Point(0.5, 0.5)
+    member this.Coords = m, n
+    member this.IsDead =
+        match map.[m].[n] with
+        | TerrainType.Spikes -> true
+        | TerrainType.Lava -> true
+        | _ -> false
+    member this.PlaceOnMap(c: Container) =
+        place()
+        c.addChild(sp) |> ignore
+    member this.Update() =
+        if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
+            sp.position <- Point(randomRational 200., randomRational 200.)
+        else
+            let distx = sp.xdest - sp.position.x
+            let disty = sp.ydest - sp.position.y
+            let scale n =
+                if n > 10. then 10.
+                elif n < -10. then -10.
+                else n
+            sp.position.x <- sp.position.x + scale distx
+            sp.position.y <- sp.position.y + scale disty

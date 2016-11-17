@@ -1,6 +1,25 @@
-﻿module Scram
+﻿module Data
 
 open System.Collections.Generic
+
+type TerrainType = Lava | Spikes | Ground | Start | Treasure
+let parseMap (input: string) : TerrainType[][] =
+    let rows = input.Trim().Split() |> Array.filter (fun x -> x.Length > 0)
+    let rows = rows |> Array.map(fun str -> seq { for x in str.Trim() do yield (match x with '^' -> Spikes | '-' -> Lava | 'X' -> Treasure | 'S' -> Start | _ -> Ground) } |> Array.ofSeq)
+    rows
+
+let level1 = parseMap """
+    ...^......
+    ......-...
+    .--.....^^
+    .-^.....^.
+    ...^..^...
+    -..---^^^.
+    .......-..
+    ..-....-.^
+    ......--..
+    .S.....S..
+"""
 
 type Event = Button1 | Button2
 type Location = Frontof of Location | Leftof of Location | Rightof of Location | Backof of Location | Me
@@ -128,12 +147,12 @@ let rec loopToCompletion execution =
         printfn "%d %s" (!count) (execution.Print())
         loopToCompletion execution
 
-loopToCompletion (spawner (Time(100, Say "Hello")))
-loopToCompletion (spawner (Time(100, Say "Hello")))
+//loopToCompletion (spawner (Time(100, Say "Hello")))
+//loopToCompletion (spawner (Time(100, Say "Hello")))
 
-let ai = If(Is(Lava, In(Frontof Me)), Do [Say "Whoa!"; Hop 1], Time(1, Forward))
-let ai2 = Do[Say "Reporting for duty";ai;Say "Job's done!"]
-printf "%A" ai
-loopToCompletion (spawner (Do[Say "Reporting for duty";Time(1, Say "Hello");Say "Job's done!"])) // wip, doesn't terminate
-loopToCompletion (spawner (Do[Say "Reporting for duty";Say "Job's done!"]))
+//let ai = If(Is(Lava, In(Frontof Me)), Do [Say "Whoa!"; Hop 1], Time(1, Forward))
+//let ai2 = Do[Say "Reporting for duty";ai;Say "Job's done!"]
+//printf "%A" ai
+//loopToCompletion (spawner (Do[Say "Reporting for duty";Time(1, Say "Hello");Say "Job's done!"])) // wip, doesn't terminate
+//loopToCompletion (spawner (Do[Say "Reporting for duty";Say "Job's done!"]))
 

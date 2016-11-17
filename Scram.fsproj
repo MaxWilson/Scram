@@ -55,6 +55,7 @@
     <Compile Include="node_modules\fable-import-react\Fable.Helpers.React.fs" />
     <Compile Include="Data.fs" />
     <Compile Include="Utils.fs" />
+    <Compile Include="Map.fs" />
     <Compile Include="Behavior.fs" />
     <Compile Include="Components.fs" />
     <Compile Include="Main.fs" />

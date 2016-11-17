@@ -19,10 +19,6 @@ open Fable.Import.PIXI
 #endif
 open Utils
 
-let tilesize = 64.
-let top,left = 20., 20.
-let bottom,right = 20.+(tilesize*10.),20.+(tilesize*10.)
-
 let rec addUnicorn (container: Container) =
     let p = Sprite.fromImage "https://www.ethereum.org/images/unicorn.png"
     p.anchor.x <- 0.5
@@ -55,30 +51,8 @@ let addText (stage: Container) msg color1 color2 =
     stage.addChild(text)
     |> ignore
 
-let makeAnimation(url, size: int, spritecoords: (int * int) list) =
-    let texture = Texture.fromImage(url)
-    let frames = spritecoords |> List.map (fun (x,y) -> Texture(texture, Rectangle(float x, float y, float size, float size))) |> ResizeArray
-    let movie = PIXI.extras.MovieClip(frames)
-    movie.gotoAndPlay(unbox (random frames.Count - 1))
-    movie
-
-let lava (stage: Container) x y =
-    let lava = makeAnimation("Lava.png", 128, [2,114;132,114;262,114;392,114;522,114;652,114;782,114;2,244;132,244;262,244;392,244])
-    lava.position <- Point(x, y)
-    lava.scale <- Point(0.5, 0.5)
-    lava.animationSpeed <- 0.2
-    stage.addChild(lava) |> ignore
-
 let onStart (stage: Container) =
-    let gr = Graphics()
-    gr.beginFill(float 0xFFFFFF).lineStyle(3., float 0x000000)
-        .drawRect(top, left, bottom-top, right-left)
-        .endFill()
-        |> ignore
-    stage.addChild(gr) |> ignore
-    for x in top..tilesize..bottom do
-        for y in left..tilesize..right do
-            lava stage x y
+    Map.renderLevel stage Data.level1
     addText stage "Hello" "blue" "red"
     addText stage "World" "orange" "purple"
     ()

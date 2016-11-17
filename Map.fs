@@ -83,7 +83,20 @@ type Robot(image: string, map: TerrainMap) =
             n <- n'
             updateDest()
     do
-        sp.anchor <- Point(0.5, 0.5)
+        sp.anchor <- Point(0.5, 0.5)        
+        document.addEventListener_keydown(fun ke ->
+                match ke.keyCode with
+                | 37. ->
+                    sp.xdest <- sp.xdest - 50.                    
+                | 39. ->
+                    sp.xdest <- sp.xdest + 50.                    
+                | 38. ->
+                    sp.ydest <- sp.ydest - 50.                    
+                | 40. -> 
+                    sp.ydest <- sp.ydest + 50.     
+                | _ -> ()
+                unbox ()               
+            )
     member this.Coords = m, n
     member this.IsDead =
         match map.[m].[n] with
@@ -95,7 +108,7 @@ type Robot(image: string, map: TerrainMap) =
         c.addChild(sp) |> ignore
     member this.Update() =
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            sp.position <- Point(randomRational 200., randomRational 200.)
+            ()
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y

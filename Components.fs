@@ -28,7 +28,7 @@ type PixiBox(canvasContainer: HTMLElement) =
         stage.on_click (fun e -> onClick(stage)) |> ignore
         let mutable timestamp = 0.
         let rec animate(dt:float) =
-            if dt - timestamp > 1000. then
+            if dt - timestamp > 10. then
                 timestamp <- dt
                 everySecond(stage)
             animate_id <- window.requestAnimationFrame(FrameRequestCallback animate)

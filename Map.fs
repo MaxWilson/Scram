@@ -82,6 +82,12 @@ type Robot(image: string, map: TerrainMap) =
             m <- m'
             n <- n'
             updateDest()
+    let destinations = [
+        200., 200.
+        500., 200.
+        300., 300.
+    ]
+    let mutable destIndex = 0
     do
         sp.anchor <- Point(0.5, 0.5)
     member this.Coords = m, n
@@ -95,7 +101,10 @@ type Robot(image: string, map: TerrainMap) =
         c.addChild(sp) |> ignore
     member this.Update() =
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            sp.position <- Point(randomRational 200., randomRational 200.)
+            let (x, y) = destinations.[destIndex]
+            sp.xdest <- x
+            sp.ydest <- y
+            destIndex <- (destIndex + 1) % 3
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y

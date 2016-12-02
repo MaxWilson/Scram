@@ -74,8 +74,8 @@ type Robot(image: string, map: TerrainMap) =
     let mutable n = -1
     let sp = Sprite.fromImage(image) |> unbox<MoveableSprite>
     let updateDest() =
-        sp.ydest <- top + (float n * tilesize) + 32.
-        sp.xdest <- left + (float m * tilesize) + 32.
+        sp.xdest <- top + (float n * tilesize) + 32.
+        sp.ydest <- left + (float m * tilesize) + 32.
     let place() =
         if m < 0 && n < 0 then
             let m', n' = randomPick legalStarts
@@ -85,15 +85,16 @@ type Robot(image: string, map: TerrainMap) =
     do
         sp.anchor <- Point(0.5, 0.5)
         document.addEventListener_keydown(fun ke ->
+                let bound n = if n < 0 then 0 elif n > 10 then 10 else n
                 match ke.keyCode with
                 | 37. ->
-                    sp.xdest <- sp.position.x - 50.
+                    n <- bound(n - 1)
                 | 39. ->
-                    sp.xdest <- sp.position.x + 50.
+                    n <- bound(n + 1)
                 | 38. ->
-                    sp.ydest <- sp.position.y - 50.
+                    m <- bound(m - 1)
                 | 40. ->
-                    sp.ydest <- sp.position.y + 50.
+                    m <- bound(m + 1)
                 | _ -> ()
                 unbox ()
             )
@@ -114,7 +115,7 @@ type Robot(image: string, map: TerrainMap) =
         c.addChild(sp) |> ignore
     member this.Update() =
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            ()
+            updateDest()
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y

@@ -7,11 +7,14 @@ open Fable.Import
 open Fable.Import.Browser
 open Fable.Import.PIXI
 open Fable.Import.React
-open Fable.Import.React_Extensions
 open Behavior
 
 module R = Fable.Helpers.React
 open R.Props
+
+[<Pojo>]
+type Stub = { stub: int }
+let stub = { stub=0 }
 
 let mutable speed = 10
 type PixiBox(canvasContainer: HTMLElement) =
@@ -39,7 +42,7 @@ let mutable box = Unchecked.defaultof<PixiBox>
 
 // create a PIXI box with an animation loop
 type DisplayBox() =
-    inherit React.Component<unit, unit>()
+    inherit React.Component<Stub, Stub>(stub)
     let mutable canvasContainer = null
     member this.render() =
         R.div [ClassName "game-canvas-container"; Ref (fun x -> canvasContainer <- (x :?> HTMLElement))][]
@@ -50,8 +53,8 @@ type DisplayBox() =
         box.Destroy()
 
 type App() =
-    inherit Component<unit, unit>()
+    inherit Component<Stub, Stub>(stub)
     member this.render() =
         R.div [Style [Height 1000]] [
-            R.com<DisplayBox,_,_>()[]
+            R.com<DisplayBox,_,_>(stub)[]
             ]

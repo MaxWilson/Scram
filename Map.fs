@@ -82,14 +82,21 @@ type Robot(image: string, map: TerrainMap) =
             m <- m'
             n <- n'
             updateDest()
-    let destinations = [
-        100., 300.
-        600., 200.
-        300., 600.
-    ]
-    let mutable destIndex = 0
     do
         sp.anchor <- Point(0.5, 0.5)
+        document.addEventListener_keydown(fun ke ->
+                match ke.keyCode with
+                | 37. ->
+                    sp.xdest <- sp.xdest - 50.
+                | 39. ->
+                    sp.xdest <- sp.xdest + 50.
+                | 38. ->
+                    sp.ydest <- sp.ydest - 50.
+                | 40. ->
+                    sp.ydest <- sp.ydest + 50.
+                | _ -> ()
+                unbox ()
+            )
     member this.Coords = m, n
     member this.IsDead =
         match map.[m].[n] with
@@ -101,17 +108,13 @@ type Robot(image: string, map: TerrainMap) =
         c.addChild(sp) |> ignore
     member this.Update() =
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            let (x, y) = destinations.[destIndex]
-            sp.xdest <- x
-            sp.ydest <- y
-            destIndex <- (destIndex + 1) % 3
+            ()
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y
-            let scale a b =
-                let c = sqrt (a*a+b*b)
-                let scalingFactor = 10./c
-                if c > 10. then a * scalingFactor
-                else a
-            sp.position.x <- sp.position.x + scale distx disty
-            sp.position.y <- sp.position.y + scale disty distx
+            let scale n =
+                if n > 10. then 10.
+                elif n < -10. then -10.
+                else n
+            sp.position.x <- sp.position.x + scale distx
+            sp.position.y <- sp.position.y + scale disty

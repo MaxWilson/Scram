@@ -65,7 +65,8 @@ let everySecond stage =
     r.Update()
     ()
 
-let onClick stage =
-    //addText stage "Scream, Run, Hide!"
+let onClick (stage, e: InteractionEvent) =
+    r.SetDest(e)
+    //addText stage "Scream, Run, Hide!" "blue" "black"
     //addAliancorn stage
     ()

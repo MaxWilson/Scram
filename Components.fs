@@ -28,7 +28,8 @@ type PixiBox(canvasContainer: HTMLElement) =
         let stage = Container()
         onStart stage
         stage.interactive <- true
-        stage.on_click (fun e -> onClick(stage)) |> ignore
+        stage.on_click (fun e -> onClick(stage, e)) |> ignore
+        stage.on_tap (fun e -> onClick(stage, e)) |> ignore
         let mutable timestamp = 0.
         let rec animate(dt:float) =
             if dt - timestamp > 10. then

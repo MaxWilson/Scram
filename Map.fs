@@ -48,8 +48,8 @@ let spikes (stage: Container) (x, y) =
 
 let mutable currentLevel : TerrainMap = Unchecked.defaultof<TerrainMap>
 
+let gr = Graphics()
 let renderLevel (stage: Container) (level : TerrainMap) =
-    let gr = Graphics()
     gr.beginFill(float 0xFFFFFF).lineStyle(3., float 0x000000)
         .drawRect(top, left, bottom-top, right-left)
         .endFill()
@@ -87,16 +87,23 @@ type Robot(image: string, map: TerrainMap) =
         document.addEventListener_keydown(fun ke ->
                 match ke.keyCode with
                 | 37. ->
-                    sp.xdest <- sp.xdest - 50.
+                    sp.xdest <- sp.position.x - 50.
                 | 39. ->
-                    sp.xdest <- sp.xdest + 50.
+                    sp.xdest <- sp.position.x + 50.
                 | 38. ->
-                    sp.ydest <- sp.ydest - 50.
+                    sp.ydest <- sp.position.y - 50.
                 | 40. ->
-                    sp.ydest <- sp.ydest + 50.
+                    sp.ydest <- sp.position.y + 50.
                 | _ -> ()
                 unbox ()
             )
+    member this.SetDest(e : InteractionEvent) =
+        let d : interaction.InteractionData = e.data |> unbox
+//        let pos = d.getLocalPosition(sp, gr.position)
+        let pos = d.getLocalPosition(gr, sp.position)
+        sp.xdest <- pos.x
+        sp.ydest <- pos.y
+        ()
     member this.Coords = m, n
     member this.IsDead =
         match map.[m].[n] with

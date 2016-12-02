@@ -98,9 +98,8 @@ type Robot(image: string, map: TerrainMap) =
                 unbox ()
             )
     member this.SetDest(e : InteractionEvent) =
-        let d : interaction.InteractionData = e.data |> unbox
-//        let pos = d.getLocalPosition(sp, gr.position)
-        let pos = d.getLocalPosition(gr, sp.position)
+        let d = e.data |> unbox<interaction.InteractionData>
+        let pos = d.``global``
         sp.xdest <- pos.x
         sp.ydest <- pos.y
         ()
@@ -119,9 +118,11 @@ type Robot(image: string, map: TerrainMap) =
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y
-            let scale n =
-                if n > 10. then 10.
-                elif n < -10. then -10.
-                else n
-            sp.position.x <- sp.position.x + scale distx
-            sp.position.y <- sp.position.y + scale disty
+            let scale a b =
+                let c = sqrt(a*a + b*b)
+                if c < 10. then
+                    a
+                else
+                    10. * a / c
+            sp.position.x <- sp.position.x + scale distx disty
+            sp.position.y <- sp.position.y + scale disty distx

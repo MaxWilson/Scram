@@ -2,11 +2,12 @@ var path = require("path");
 var webpack = require("webpack");
 
 var cfg = {
-  entry: [
-    "./js/main.js"
-  ],
+  entry: {
+    main:"./js/main.js"
+  },
   output: {
-    filename: "bundle.js"
+    path: path.join(__dirname, "public"),
+    filename: "[name].bundle.js"
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -16,11 +17,17 @@ var cfg = {
     })
   ],
   module: {
-    preLoaders: [
+    rules: [
       {
+        enforce: 'pre',
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "source-map-loader"
+        loader: 'source-map-loader'
+      },
+      {
+        enforce: 'pre',
+        test: /\.css/, 
+        loader: 'style-loader!css-loader'
       }
     ]
   }

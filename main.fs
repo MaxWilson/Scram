@@ -5,6 +5,9 @@ open Fable.Core
 open Fable.Import
 module R = Fable.Helpers.React
 
+// load styles
+Node.require.Invoke("../app.css") |> ignore
+
 // Check components.fs to see how to build React components from F#
 open Components
 

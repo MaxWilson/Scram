@@ -1,5 +1,5 @@
 {
-  "module": "commonjs",
+  "module": "es2015",
   "sourceMaps": true,
   "projFile": "Scram.fsproj",
   "outDir": "js",

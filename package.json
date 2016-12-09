@@ -20,16 +20,18 @@
   "license": "ISC",
   "devDependencies": {
     "core-js": "^2.4.1",
-    "fable-compiler": "^0.7.17",
-    "fable-core": "^0.7.12",
+    "css-loader": "^0.26.1",
+    "fable-compiler": "^0.7.25",
+    "fable-core": "^0.7.18",
     "fable-import-pixi": "0.0.10",
     "fable-import-react": "^0.5.2",
-    "fable-react": "^0.7.10",
-    "pixi.js": "^4.1.1",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
+    "fable-react": "^0.7.14",
+    "pixi.js": "^4.3.1",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
     "source-map-loader": "^0.1.5",
-    "webpack": "^1.13.3",
-    "webpack-dev-server": "^1.16.2"
+    "style-loader": "^0.13.1",
+    "webpack": "^2.2.0-rc.3",
+    "webpack-dev-server": "^2.2.0-rc.0"
   }
 }

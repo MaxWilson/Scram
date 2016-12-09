@@ -82,3 +82,6 @@ let onClick (stage, e: InteractionEvent) =
     //addText stage "Scream, Run, Hide!" "blue" "black"
     //addAliancorn stage
     ()
+
+
+

@@ -68,10 +68,18 @@ let renderLevel (stage: Container) (level : TerrainMap) =
             | _ ->
                 ground stage coords
 
-type Robot(image: string, map: TerrainMap) =
+module RobotImpl =
+    type Direction = | Left | Right | Up | Down
+    let TurnLeft = function Left -> Down | Down -> Right | Right -> Up | Up -> Left
+    let TurnRight = function Right -> Down | Down -> Left | Left -> Up | Up -> Right
+    let RotationAngle = function Right -> 90. | Down -> 180. | Left -> 270. | Up -> 0.
+open RobotImpl
+type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior list) =
     let legalStarts = mapIndexes map Start |> List.ofSeq
     let mutable m = -1
     let mutable n = -1
+    let mutable Direction = Up
+    let mutable Instructions = []
     let sp = Sprite.fromImage(image) |> unbox<MoveableSprite>
     let updateDest() =
         sp.xdest <- top + (float n * tilesize) + 32.
@@ -84,20 +92,6 @@ type Robot(image: string, map: TerrainMap) =
             updateDest()
     do
         sp.anchor <- Point(0.5, 0.5)
-        document.addEventListener_keydown(fun ke ->
-                let bound n = if n < 0 then 0 elif n > 10 then 10 else n
-                match ke.keyCode with
-                | 37. ->
-                    n <- bound(n - 1)
-                | 39. ->
-                    n <- bound(n + 1)
-                | 38. ->
-                    m <- bound(m - 1)
-                | 40. ->
-                    m <- bound(m + 1)
-                | _ -> ()
-                unbox ()
-            )
     member this.SetDest(e : InteractionEvent) =
         let d = e.data |> unbox<interaction.InteractionData>
         let pos = d.``global``
@@ -115,7 +109,30 @@ type Robot(image: string, map: TerrainMap) =
         c.addChild(sp) |> ignore
     member this.Update() =
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            updateDest()
+            match Instructions with
+            | [] -> Instructions <- computeInstructions()
+            | currentInstruction :: rest ->
+                Instructions <- rest
+                match currentInstruction with
+                | Behavior.Left ->
+                    Direction <- TurnLeft Direction
+                    sp.rotation <- RotationAngle Direction
+                | Behavior.Right ->
+                    Direction <- TurnRight Direction
+                    sp.rotation <- RotationAngle Direction
+                | Forward ->
+                    let bound n = if n < 0 then 0 elif n > 9 then 9 else n
+                    match Direction with
+                    | Left ->
+                        n <- bound(n - 1)
+                    | Right ->
+                        n <- bound(n + 1)
+                    | Up ->
+                        m <- bound(m - 1)
+                    | Down ->
+                        m <- bound(m + 1)
+                    updateDest()
+                | _ -> ()
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y

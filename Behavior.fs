@@ -18,6 +18,7 @@ open Fable.Import.Browser
 open Fable.Import.PIXI
 #endif
 open Utils
+open Data
 
 let rec addUnicorn (container: Container) =
     let p = Sprite.fromImage "https://www.ethereum.org/images/unicorn.png"
@@ -51,22 +52,33 @@ let addText (stage: Container) msg color1 color2 =
     stage.addChild(text)
     |> ignore
 
-let r = Map.Robot("aliancorn.png", Data.level1)
+let alienBrain() =
+    [Forward;Left]
+let unicornBrain() =
+    if Keys.pressed.Contains(Keys.Left) then [Left; Forward]
+    elif Keys.pressed.Contains(Keys.Right) then [Right; Forward]
+    elif Keys.pressed.Contains(Keys.Up) then [Forward]
+    else [Left; Forward; Right; Forward;Forward;Forward;Forward;Left]
+
+let alien = Map.Robot("aliancorn.png", Data.level1, alienBrain)
+let unicorn = Map.Robot("Unicorn.png", Data.level1, unicornBrain)
 let onStart (stage: Container) =
     Map.renderLevel stage Data.level1
     addText stage "Invade" "blue" "red"
     addText stage "Planet" "orange" "purple"
     addText stage "Earth" "red" "green"
-    r.PlaceOnMap(stage)
+    alien.PlaceOnMap(stage)
+    unicorn.PlaceOnMap(stage)
     ()
 
 let everySecond stage =
     //addText stage "Attack!"
-    r.Update()
+    alien.Update()
+    unicorn.Update()
     ()
 
 let onClick (stage, e: InteractionEvent) =
-    r.SetDest(e)
+    //r.SetDest(e)
     //addText stage "Scream, Run, Hide!" "blue" "black"
     //addAliancorn stage
     ()

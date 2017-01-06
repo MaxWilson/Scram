@@ -46,7 +46,7 @@ module RobotImpl =
     type Direction = | Left | Right | Up | Down
     let TurnLeft = function Left -> Down | Down -> Right | Right -> Up | Up -> Left
     let TurnRight = function Right -> Down | Down -> Left | Left -> Up | Up -> Right
-    let RotationAngle = function Right -> 90. | Down -> 180. | Left -> 270. | Up -> 0.
+    let RotationAngle = function Right -> 0. | Down -> Math.PI/2. | Left -> Math.PI | Up -> -Math.PI/2.
 
 type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior list) =
     let legalStarts = mapIndexes map Start |> List.ofSeq
@@ -68,6 +68,9 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
         // should be at rest on its destination
         sp.x <- sp.xdest
         sp.y <- sp.ydest
+        // reset rotation
+        Direction <- RobotImpl.Direction.Up
+        sp.rotation <- RobotImpl.RotationAngle Direction
     do
         sp.anchor <- Point(0.5, 0.5)
     member this.SetDest(e : InteractionEvent) =
@@ -143,13 +146,20 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
             sp.position.x <- sp.position.x + scale distx disty
             sp.position.y <- sp.position.y + scale disty distx
 
+let KLeft = 37
+let KRight = 39
+let KUp = 38
+let KDown = 40
+let KEnter = 13
+
 let alienBrain() =
     [Forward;Left]
 let unicornBrain() =
-    if Keys.pressed.Contains(Keys.Left) then [Left; Forward]
-    elif Keys.pressed.Contains(Keys.Right) then [Right; Forward]
-    elif Keys.pressed.Contains(Keys.Up) then [Forward]
-    else [Left; Forward; Right; Forward;Forward;Forward;Forward;Left]
+    let k = Keys.pressed
+    if k.Contains KLeft then [Left; Forward]
+    elif k.Contains KRight then [Right; Forward]
+    elif k.Contains KUp then [Forward]
+    else []
 
 let robots = [
                 Robot("aliancorn.png", Data.level1, alienBrain);

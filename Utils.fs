@@ -19,10 +19,5 @@ let randomPick (vals: 't list) =
 
 module Keys =
     let mutable pressed = System.Collections.Generic.List<_>()
-    Fable.Import.Browser.document.addEventListener_keydown(fun ke -> pressed.Add(ke.keyCode |> int); unbox ())
+    Fable.Import.Browser.document.addEventListener_keydown(fun ke -> (if (not <| pressed.Contains (ke.keyCode |> int)) then pressed.Add(ke.keyCode |> int)); unbox ())
     Fable.Import.Browser.document.addEventListener_keyup(fun ke -> (if (pressed.Contains (ke.keyCode |> int)) then pressed.Remove(ke.keyCode |> int) |> ignore); unbox ())
-    let Left = 37
-    let Right = 39
-    let Up = 38
-    let Down = 40
-    let Enter = 13

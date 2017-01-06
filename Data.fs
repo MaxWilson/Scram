@@ -197,15 +197,15 @@ let peek(map : TerrainType[][], mn:int*int, (currentFacing: Direction), (loc: Lo
     | Direction.Right -> m, n+1
     | Direction.Down -> m+1, n
     let left = (function
-    | Direction.Up -> Direction.Left
-    | Direction.Left -> Direction.Down
-    | Direction.Down -> Direction.Right
-    | Direction.Right -> Direction.Up)
+        | Direction.Up -> Direction.Left
+        | Direction.Left -> Direction.Down
+        | Direction.Down -> Direction.Right
+        | Direction.Right -> Direction.Up)
     let right = (function
-    | Direction.Up -> Direction.Right
-    | Direction.Right -> Direction.Down
-    | Direction.Down -> Direction.Left
-    | Direction.Left-> Direction.Up)
+        | Direction.Up -> Direction.Right
+        | Direction.Right -> Direction.Down
+        | Direction.Down -> Direction.Left
+        | Direction.Left-> Direction.Up)
 
     let rec findCoords c =
         function

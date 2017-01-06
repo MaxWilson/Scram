@@ -157,12 +157,4 @@ let rec loopToCompletion execution =
         printfn "%d %s" (!count) (execution.Print())
         loopToCompletion execution
 
-//loopToCompletion (spawner (Time(100, Say "Hello")))
-//loopToCompletion (spawner (Time(100, Say "Hello")))
-
-//let ai = If(Is(Lava, In(Frontof Me)), Do [Say "Whoa!"; Hop 1], Time(1, Forward))
-//let ai2 = Do[Say "Reporting for duty";ai;Say "Job's done!"]
-//printf "%A" ai
-//loopToCompletion (spawner (Do[Say "Reporting for duty";Time(1, Say "Hello");Say "Job's done!"])) // wip, doesn't terminate
-//loopToCompletion (spawner (Do[Say "Reporting for duty";Say "Job's done!"]))
 

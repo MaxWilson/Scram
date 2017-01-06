@@ -26,7 +26,7 @@ let makeAnimation(url, size: int, spritecoords: (int * int) list) =
     movie
 
 let lava (stage: Container) (x, y) =
-    let lava = makeAnimation("Lava.png", 128, [2,114;132,114;262,114;392,114;522,114;652,114;782,114;2,244;132,244;262,244;392,244])
+    let lava = makeAnimation("Lava.PNG", 128, [2,114;132,114;262,114;392,114;522,114;652,114;782,114;2,244;132,244;262,244;392,244])
     lava.position <- Point(x, y)
     lava.scale <- Point(0.5, 0.5)
     lava.animationSpeed <- 0.2
@@ -41,7 +41,7 @@ let ground (stage: Container) (x, y) =
 
 let spikes (stage: Container) (x, y) =
     ground stage (x, y)
-    let s = Sprite.fromImage (sprintf "spike%d.png" (random 4))
+    let s = Sprite.fromImage (sprintf "Spike%d.png" (random 4))
     s.position <- Point(x,y)
     stage.addChild(s)
     |> ignore

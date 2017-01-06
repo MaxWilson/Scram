@@ -46,7 +46,15 @@ let spikes (stage: Container) (x, y) =
     stage.addChild(s)
     |> ignore
 
+let treasure (stage: Container) (x, y) =
+    ground stage (x, y)
+    let s = Sprite.fromImage "Treasure.png"
+    s.position <- Point(x,y)
+    stage.addChild(s)
+    |> ignore
+
 let mutable currentLevel : TerrainMap = Unchecked.defaultof<TerrainMap>
+let setLevel lvl = currentLevel <- lvl
 
 let gr = Graphics()
 let renderLevel (stage: Container) (level : TerrainMap) =
@@ -66,6 +74,8 @@ let renderLevel (stage: Container) (level : TerrainMap) =
                 lava stage coords
             | TerrainType.Spikes ->
                 spikes stage coords
+            | TerrainType.Treasure ->
+                treasure stage coords
             | _ ->
                 ground stage coords
 
@@ -74,4 +84,10 @@ let isDeadly m n =
     else
         match currentLevel.[m].[n] with
         | TerrainType.Lava | TerrainType.Spikes -> true
+        | _ -> false
+let isTreasure m n =
+    if currentLevel = null || m >= currentLevel.Length || n >= currentLevel.[m].Length then false
+    else
+        match currentLevel.[m].[n] with
+        | TerrainType.Treasure -> true
         | _ -> false

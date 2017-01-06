@@ -55,6 +55,7 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
     let mutable Direction = RobotImpl.Direction.Up
     let mutable Instructions = []
     let mutable isDead = false
+    let mutable isWinner = false
     let scream = Audio.Create("Scream.mp3")
     let sp = Sprite.fromImage(image) |> unbox<MoveableSprite>
     let updateDest() =
@@ -71,8 +72,12 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
         // reset rotation
         Direction <- RobotImpl.Direction.Up
         sp.rotation <- RobotImpl.RotationAngle Direction
+        isDead <- false
+        isWinner <- false
+        sp.scale <- Point(1., 1.)
     do
         sp.anchor <- Point(0.5, 0.5)
+    member this.IsWinner = isWinner
     member this.SetDest(e : InteractionEvent) =
         let d = e.data |> unbox<interaction.InteractionData>
         let pos = d.``global``
@@ -92,8 +97,6 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
         // come back to life if necessary
         if isDead then
             place()
-            isDead <- false
-            sp.scale <- Point(1., 1.)
 
         // when at rest and no instructions, get new instructions
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
@@ -108,6 +111,9 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
             if Scram.Map.isDeadly m n then
                 scream.play()
                 isDead <- true
+                sp.scale <- Point(1.5, 1.5)
+            elif Scram.Map.isTreasure m n then
+                isWinner <- true
                 sp.scale <- Point(1.5, 1.5)
             else
                 match Instructions with
@@ -161,20 +167,32 @@ let unicornBrain() =
     elif k.Contains KUp then [Forward]
     else []
 
-let robots = [
-                Robot("aliancorn.png", Data.level1, alienBrain);
-                Robot("Unicorn.png", Data.level1, unicornBrain)
+
+let mutable robots = []
+let mutable levelCount = 0
+let setupNewLevel (stage : Container) =
+    stage.removeChildren() |> ignore
+    levelCount <- levelCount + 1
+    let rec changeLevel() =
+        let l = Utils.randomPick Data.levels
+        if l <> Scram.Map.currentLevel then
+            Scram.Map.setLevel l
+        else changeLevel()
+    changeLevel()
+    let lvl = Scram.Map.currentLevel
+    robots <- [
+                Robot("aliancorn.png", lvl, alienBrain);
+                Robot("Unicorn.png", lvl, unicornBrain)
                 ]
+    Scram.Map.renderLevel stage lvl
+    addText stage (sprintf "Level %d" levelCount) "blue" "red"
+    robots |> List.iter (fun r -> r.PlaceOnMap stage)
+
 
 let onStart (stage: Container) =
-    Scram.Map.renderLevel stage Data.level1
-    addText stage "Level 1" "blue" "red"
-    ()
+    setupNewLevel stage
 
 let onClick (stage, e: InteractionEvent) =
-    //r.SetDest(e)
-    //addText stage "Scream, Run, Hide!" "blue" "black"
-    //addAliancorn stage
     ()
 
 

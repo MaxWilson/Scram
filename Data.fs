@@ -9,8 +9,10 @@ let parseMap (input: string) : TerrainType[][] =
     let rows = rows |> Array.map(fun str -> seq { for x in str.Trim() do yield (match x with '^' -> Spikes | '-' -> Lava | 'X' -> Treasure | 'S' -> Start | _ -> Ground) } |> Array.ofSeq)
     rows
 
-let level1 = parseMap """
-    ...^..^...
+let levels =
+    [
+    """
+    ...^..^X..
     ......-...
     .--.....^^
     .-...-..^.
@@ -20,7 +22,33 @@ let level1 = parseMap """
     ..-....-.^
     ......--..
     .S.....S..
-"""
+    """
+    """
+    ...^..^...
+    ......-...
+    .--.....^^
+    .--..-..^.
+    ...^^^^X..
+    -..---^^^.
+    .......-..
+    ..-....-.^
+    ......--..
+    ...-...^S.
+    """
+    """
+    ...^..^^S.
+    ......-...
+    .--.....^^
+    X-...-..^.
+    -..^..^S..
+    -..---^^^.
+    ....-..-..
+    ..-.-S.-.^
+    ....-.--..
+    ..........
+    """
+    ] |> List.map parseMap
+
 
 let mapIndexes (map: TerrainMap) (t: TerrainType) =
     seq {

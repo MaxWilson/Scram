@@ -27,7 +27,6 @@ type PixiBox(canvasContainer: HTMLElement) =
         canvasContainer.appendChild(renderer.view) |> ignore
         let stage = Container()
         onStart stage
-        robots |> List.iter (fun r -> r.PlaceOnMap stage)
         stage.interactive <- true
         stage.on_click (fun e -> onClick(stage, e)) |> ignore
         stage.on_tap (fun e -> onClick(stage, e)) |> ignore
@@ -37,6 +36,8 @@ type PixiBox(canvasContainer: HTMLElement) =
             if dt - timestamp > 1000. then
                 timestamp <- dt
                 robots |> List.iter (fun r -> r.EverySecond())
+                if robots |> List.exists (fun r -> r.IsWinner) then
+                    Robot.setupNewLevel(stage)
             animate_id <- window.requestAnimationFrame(FrameRequestCallback animate)
             renderer.render(stage)
         animate 0. // start a pixi animation loop

@@ -1,1 +1,1 @@
-npm run build && (git branch -D gh-pages || echo "First init") && git checkout -b gh-pages && git add . && git commit -a -m "New version" && git push origin gh-pages -f && git checkout master
+(git branch -D gh-pages || echo "First init") && git checkout -b gh-pages && (rmdir /s/q public || echo "public is already removed") && npm run build && git add . && git commit -a -m "New version" && git push origin gh-pages -f && git checkout master

@@ -27,14 +27,17 @@ type PixiBox(canvasContainer: HTMLElement) =
         canvasContainer.appendChild(renderer.view) |> ignore
         let stage = Container()
         onStart stage
+        robots |> List.iter (fun r -> r.PlaceOnMap stage)
         stage.interactive <- true
         stage.on_click (fun e -> onClick(stage, e)) |> ignore
         stage.on_tap (fun e -> onClick(stage, e)) |> ignore
         let mutable timestamp = 0.
         let rec animate(dt:float) =
-            if dt - timestamp > 10. then
+            robots |> List.iter (fun r -> r.Update())
+            if dt - timestamp > 1000. then
                 timestamp <- dt
                 everySecond(stage)
+                robots |> List.iter (fun r -> r.Think())
             animate_id <- window.requestAnimationFrame(FrameRequestCallback animate)
             renderer.render(stage)
         animate 0. // start a pixi animation loop

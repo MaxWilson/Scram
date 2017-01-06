@@ -51,7 +51,7 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="Fable.Import.Pixi.v4.fs" />
+    <Compile Include="Fable.Import.Pixi.fs" />
     <Compile Include="Data.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Map.fs" />

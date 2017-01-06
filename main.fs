@@ -15,6 +15,6 @@ open Components
 Node.require.Invoke("core-js") |> ignore
 
 ReactDom.render(
-    R.com<App,_,_> (stub) [],
+    RobotApp(),
     Browser.document.getElementById "content")
 |> ignore

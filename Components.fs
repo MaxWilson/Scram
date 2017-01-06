@@ -39,23 +39,22 @@ type PixiBox(canvasContainer: HTMLElement) =
             renderer.render(stage)
         animate 0. // start a pixi animation loop
 
-let mutable box = Unchecked.defaultof<PixiBox>
+[<Pojo>]
+type DisplayBoxState = { box: PixiBox }
 
 // create a PIXI box with an animation loop
 type DisplayBox() =
-    inherit React.Component<Stub, Stub>(stub)
+    inherit React.Component<Stub, DisplayBoxState>(stub)
     let mutable canvasContainer = null
     member this.render() =
         R.div [ClassName "game-canvas-container"; Ref (fun x -> canvasContainer <- (x :?> HTMLElement))][]
     member this.componentDidMount() =
-        box <- PixiBox(canvasContainer)
+        let box = PixiBox(canvasContainer)
+        this.setState({box=box})
         box.Setup()
     member this.componentWillUnmount() =
-        box.Destroy()
+        this.state.box.Destroy()
 
-type App() =
-    inherit Component<Stub, Stub>(stub)
-    member this.render() =
-        R.div [Style [Height 1000]] [
-            R.com<DisplayBox,_,_>(stub)[]
-            ]
+let RobotApp() = R.div [Style [Height 1000]] [
+                    R.com<DisplayBox,_,_>(stub)[]
+                    ]

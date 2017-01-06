@@ -60,6 +60,11 @@ let mapIndexes (map: TerrainMap) (t: TerrainType) =
     }
 
 type Event = Button1 | Button2
+
+type Direction = | Left | Right | Up | Down
+    with
+    static member TurnLeft = function Direction.Left -> Direction.Down | Direction.Down -> Direction.Right | Direction.Right -> Direction.Up | Direction.Up -> Direction.Left
+    static member TurnRight = function Direction.Right -> Direction.Down | Direction.Down -> Direction.Left | Direction.Left -> Direction.Up | Direction.Up -> Direction.Right
 type Location = Frontof of Location | Leftof of Location | Rightof of Location | Backof of Location | Me
 type TileVal = On of Location | In of Location | To of Location | Lava | Spikes | Clear
 type Predicate = Is of TileVal * TileVal | When of Event
@@ -185,4 +190,43 @@ let rec loopToCompletion execution =
         printfn "%d %s" (!count) (execution.Print())
         loopToCompletion execution
 
+let peek(map : TerrainType[][], mn:int*int, (currentFacing: Direction), (loc: Location)) =
+    let move (m, n) = function
+    | Direction.Up -> m-1, n
+    | Direction.Left -> m, n-1
+    | Direction.Right -> m, n+1
+    | Direction.Down -> m+1, n
+    let left = (function
+    | Direction.Up -> Direction.Left
+    | Direction.Left -> Direction.Down
+    | Direction.Down -> Direction.Right
+    | Direction.Right -> Direction.Up)
+    let right = (function
+    | Direction.Up -> Direction.Right
+    | Direction.Right -> Direction.Down
+    | Direction.Down -> Direction.Left
+    | Direction.Left-> Direction.Up)
+
+    let rec findCoords c =
+        function
+        | Me -> c
+        | Frontof(rest) ->
+            move (findCoords c rest) (currentFacing)
+        | Backof(rest) ->
+            move (findCoords c rest) (left (left currentFacing))
+        | Leftof(rest) ->
+            move (findCoords c rest) (left currentFacing)
+        | Rightof(rest) ->
+            move (findCoords c rest) (right currentFacing)
+
+    let m',n' = findCoords mn loc
+    let bounded upper x = 0 <= x && x < upper
+    if map <> null && bounded map.Length m' && bounded map.[m'].Length n' then
+        // start states count as ground
+        match map.[m'].[n'] with
+        | TerrainType.Start -> TerrainType.Ground
+        | x -> x
+        |> Some
+    else
+        None
 

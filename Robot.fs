@@ -42,17 +42,13 @@ let addText (stage: Container) msg color1 color2 =
     stage.addChild(text)
     |> ignore
 
-module RobotImpl =
-    type Direction = | Left | Right | Up | Down
-    let TurnLeft = function Left -> Down | Down -> Right | Right -> Up | Up -> Left
-    let TurnRight = function Right -> Down | Down -> Left | Left -> Up | Up -> Right
-    let RotationAngle = function Right -> 0. | Down -> Math.PI/2. | Left -> Math.PI | Up -> -Math.PI/2.
+let RotationAngle = function Direction.Right -> 0. | Direction.Down -> Math.PI/2. | Direction.Left -> Math.PI | Direction.Up -> -Math.PI/2.
 
-type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior list) =
+type Robot(image: string, map: TerrainMap, computeInstructions: Robot -> Behavior list) =
     let legalStarts = mapIndexes map Start |> List.ofSeq
     let mutable m = -1
     let mutable n = -1
-    let mutable Direction = RobotImpl.Direction.Up
+    let mutable direction = Direction.Up
     let mutable Instructions = []
     let mutable isDead = false
     let mutable isWinner = false
@@ -70,8 +66,8 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
         sp.x <- sp.xdest
         sp.y <- sp.ydest
         // reset rotation
-        Direction <- RobotImpl.Direction.Up
-        sp.rotation <- RobotImpl.RotationAngle Direction
+        direction <- Direction.Up
+        sp.rotation <- RotationAngle direction
         isDead <- false
         isWinner <- false
         sp.scale <- Point(1., 1.)
@@ -101,8 +97,9 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
         // when at rest and no instructions, get new instructions
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
             if List.isEmpty Instructions then
-                Instructions <- computeInstructions()
-
+                Instructions <- computeInstructions this
+    member this.Peek(location:Location) =
+        Data.peek(map, (m,n), direction, location)
     member this.Update() =
         if isDead then
             () // do nothing
@@ -122,21 +119,21 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
                     Instructions <- rest
                     match currentInstruction with
                     | Behavior.Left ->
-                        Direction <- RobotImpl.TurnLeft Direction
-                        sp.rotation <- RobotImpl.RotationAngle Direction
+                        direction <- Direction.TurnLeft direction
+                        sp.rotation <- RotationAngle direction
                     | Behavior.Right ->
-                        Direction <- RobotImpl.TurnRight Direction
-                        sp.rotation <- RobotImpl.RotationAngle Direction
+                        direction <- Direction.TurnRight direction
+                        sp.rotation <- RotationAngle direction
                     | Forward ->
                         let bound n = if n < 0 then 0 elif n > 9 then 9 else n
-                        match Direction with
-                        | RobotImpl.Left ->
+                        match direction with
+                        | Direction.Left ->
                             n <- bound(n - 1)
-                        | RobotImpl.Right ->
+                        | Direction.Right ->
                             n <- bound(n + 1)
-                        | RobotImpl.Up ->
+                        | Direction.Up ->
                             m <- bound(m - 1)
-                        | RobotImpl.Down ->
+                        | Direction.Down ->
                             m <- bound(m + 1)
                         updateDest()
                     | _ -> ()
@@ -158,9 +155,17 @@ let KUp = 38
 let KDown = 40
 let KEnter = 13
 
-let alienBrain() =
-    [Forward;Left]
-let unicornBrain() =
+let alienBrain (robot:Robot) =
+    // Go right if you can UNLESS that leaves empty space on your right (because we don't want U-turns), otherwise go forward, or turn left
+    match robot.Peek(Rightof(Me)) with
+    | Some(TerrainType.Treasure) | Some(TerrainType.Ground) when (match robot.Peek(Backof(Rightof(Me))) with Some(TerrainType.Treasure) | Some(TerrainType.Ground) -> false | _ -> true) ->
+        [Right; Forward]
+    | _ ->
+        match robot.Peek(Frontof(Me)) with
+        | Some(TerrainType.Treasure) | Some(TerrainType.Ground) -> [Forward]
+        | _ -> [Left]
+
+let unicornBrain robot =
     let k = Keys.pressed
     if k.Contains KLeft then [Left; Forward]
     elif k.Contains KRight then [Right; Forward]

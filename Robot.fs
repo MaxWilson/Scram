@@ -1,22 +1,11 @@
-#if INTERACTIVE
-#r "bin\\Debug\\Fable.Core.dll"
+module Robot
+
 open System
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import
 open Fable.Import.Browser
 open Fable.Import.PIXI
-#load "Fable.Import.Pixi.v4.fs"
-#load "Utils.fs"
-#else
-module Behavior
-open System
-open Fable.Core
-open Fable.Core.JsInterop
-open Fable.Import
-open Fable.Import.Browser
-open Fable.Import.PIXI
-#endif
 open Utils
 open Data
 open Scram.Map
@@ -65,16 +54,20 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
     let mutable n = -1
     let mutable Direction = RobotImpl.Direction.Up
     let mutable Instructions = []
+    let mutable isDead = false
+    let scream = Audio.Create("Scream.mp3")
     let sp = Sprite.fromImage(image) |> unbox<MoveableSprite>
     let updateDest() =
         sp.xdest <- top + (float n * tilesize) + 32.
         sp.ydest <- left + (float m * tilesize) + 32.
     let place() =
-        if m < 0 && n < 0 then
-            let m', n' = randomPick legalStarts
-            m <- m'
-            n <- n'
-            updateDest()
+        let m', n' = randomPick legalStarts
+        m <- m'
+        n <- n'
+        updateDest() // set destination to legalStart
+        // should be at rest on its destination
+        sp.x <- sp.xdest
+        sp.y <- sp.ydest
     do
         sp.anchor <- Point(0.5, 0.5)
     member this.SetDest(e : InteractionEvent) =
@@ -92,38 +85,52 @@ type Robot(image: string, map: TerrainMap, computeInstructions: unit -> Behavior
     member this.PlaceOnMap(c: Container) =
         place()
         c.addChild(sp) |> ignore
-    member this.Think() =
+    member this.EverySecond() =
+        // come back to life if necessary
+        if isDead then
+            place()
+            isDead <- false
+            sp.scale <- Point(1., 1.)
+
         // when at rest and no instructions, get new instructions
         if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            match Instructions with
-            | [] -> Instructions <- computeInstructions()
-            | _ -> ()
+            if List.isEmpty Instructions then
+                Instructions <- computeInstructions()
+
     member this.Update() =
-        if sp.xdest = sp.position.x && sp.ydest = sp.position.y then
-            match Instructions with
-            | [] -> ()
-            | currentInstruction :: rest ->
-                Instructions <- rest
-                match currentInstruction with
-                | Behavior.Left ->
-                    Direction <- RobotImpl.TurnLeft Direction
-                    sp.rotation <- RobotImpl.RotationAngle Direction
-                | Behavior.Right ->
-                    Direction <- RobotImpl.TurnRight Direction
-                    sp.rotation <- RobotImpl.RotationAngle Direction
-                | Forward ->
-                    let bound n = if n < 0 then 0 elif n > 9 then 9 else n
-                    match Direction with
-                    | RobotImpl.Left ->
-                        n <- bound(n - 1)
-                    | RobotImpl.Right ->
-                        n <- bound(n + 1)
-                    | RobotImpl.Up ->
-                        m <- bound(m - 1)
-                    | RobotImpl.Down ->
-                        m <- bound(m + 1)
-                    updateDest()
-                | _ -> ()
+        if isDead then
+            () // do nothing
+        elif sp.xdest = sp.position.x && sp.ydest = sp.position.y then
+            // if at rest on a deadly spot, then die
+            if Scram.Map.isDeadly m n then
+                scream.play()
+                isDead <- true
+                sp.scale <- Point(1.5, 1.5)
+            else
+                match Instructions with
+                | [] -> ()
+                | currentInstruction :: rest ->
+                    Instructions <- rest
+                    match currentInstruction with
+                    | Behavior.Left ->
+                        Direction <- RobotImpl.TurnLeft Direction
+                        sp.rotation <- RobotImpl.RotationAngle Direction
+                    | Behavior.Right ->
+                        Direction <- RobotImpl.TurnRight Direction
+                        sp.rotation <- RobotImpl.RotationAngle Direction
+                    | Forward ->
+                        let bound n = if n < 0 then 0 elif n > 9 then 9 else n
+                        match Direction with
+                        | RobotImpl.Left ->
+                            n <- bound(n - 1)
+                        | RobotImpl.Right ->
+                            n <- bound(n + 1)
+                        | RobotImpl.Up ->
+                            m <- bound(m - 1)
+                        | RobotImpl.Down ->
+                            m <- bound(m + 1)
+                        updateDest()
+                    | _ -> ()
         else
             let distx = sp.xdest - sp.position.x
             let disty = sp.ydest - sp.position.y
@@ -152,10 +159,6 @@ let robots = [
 let onStart (stage: Container) =
     Scram.Map.renderLevel stage Data.level1
     addText stage "Level 1" "blue" "red"
-    ()
-
-let everySecond stage =
-    //addText stage "Attack!"
     ()
 
 let onClick (stage, e: InteractionEvent) =

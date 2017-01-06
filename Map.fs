@@ -50,6 +50,7 @@ let mutable currentLevel : TerrainMap = Unchecked.defaultof<TerrainMap>
 
 let gr = Graphics()
 let renderLevel (stage: Container) (level : TerrainMap) =
+    currentLevel <- level
     gr.beginFill(float 0xFFFFFF).lineStyle(3., float 0x000000)
         .drawRect(top, left, bottom-top, right-left)
         .endFill()
@@ -68,3 +69,9 @@ let renderLevel (stage: Container) (level : TerrainMap) =
             | _ ->
                 ground stage coords
 
+let isDeadly m n =
+    if currentLevel = null || m >= currentLevel.Length || n >= currentLevel.[m].Length then false
+    else
+        match currentLevel.[m].[n] with
+        | TerrainType.Lava | TerrainType.Spikes -> true
+        | _ -> false

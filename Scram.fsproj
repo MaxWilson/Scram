@@ -55,7 +55,7 @@
     <Compile Include="Data.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="Map.fs" />
-    <Compile Include="Behavior.fs" />
+    <Compile Include="Robot.fs" />
     <Compile Include="Components.fs" />
     <Compile Include="Main.fs" />
     <None Include="index.html" />

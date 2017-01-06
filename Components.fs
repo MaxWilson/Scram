@@ -7,7 +7,7 @@ open Fable.Import
 open Fable.Import.Browser
 open Fable.Import.PIXI
 open Fable.Import.React
-open Behavior
+open Robot
 
 module R = Fable.Helpers.React
 open R.Props
@@ -36,8 +36,7 @@ type PixiBox(canvasContainer: HTMLElement) =
             robots |> List.iter (fun r -> r.Update())
             if dt - timestamp > 1000. then
                 timestamp <- dt
-                everySecond(stage)
-                robots |> List.iter (fun r -> r.Think())
+                robots |> List.iter (fun r -> r.EverySecond())
             animate_id <- window.requestAnimationFrame(FrameRequestCallback animate)
             renderer.render(stage)
         animate 0. // start a pixi animation loop

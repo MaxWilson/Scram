@@ -55,8 +55,8 @@ let treasure (stage: Container) (x, y) =
 let mutable levelIndex = 0
 let mutable currentLevel : TerrainMap = Unchecked.defaultof<TerrainMap>
 let nextLevel() =
-    levelIndex <- (levelIndex + 1) % levels.Length
     currentLevel <- levels.[levelIndex]
+    levelIndex <- (levelIndex + 1) % levels.Length
 
 let gr = Graphics()
 let renderLevel (stage: Container) (level : TerrainMap) =

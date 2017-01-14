@@ -170,6 +170,7 @@ let unicornBrain robot =
     if k.Contains KLeft then [Left; Forward]
     elif k.Contains KRight then [Right; Forward]
     elif k.Contains KUp then [Forward]
+    elif k.Contains KDown then [Right; Right; Forward]
     else []
 
 

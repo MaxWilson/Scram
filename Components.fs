@@ -33,7 +33,7 @@ type PixiBox(canvasContainer: HTMLElement) =
         let mutable timestamp = 0.
         let rec animate(dt:float) =
             robots |> List.iter (fun r -> r.Update())
-            if dt - timestamp > 1000. then
+            if dt - timestamp > 100. then
                 timestamp <- dt
                 robots |> List.iter (fun r -> r.EverySecond())
                 if robots |> List.exists (fun r -> r.IsWinner) then

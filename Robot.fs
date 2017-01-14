@@ -165,10 +165,10 @@ let alienBrain (robot:Robot) =
         | Some(TerrainType.Treasure) | Some(TerrainType.Ground) -> [Forward]
         | _ -> [Left]
 
-let unicornBrain robot =
+let unicornBrain (robot: Robot) =
     let k = Keys.pressed
-    if k.Contains KLeft then [Left; Forward]
-    elif k.Contains KRight then [Right; Forward]
+    if k.Contains KLeft then [Left]
+    elif k.Contains KRight then [Right]
     elif k.Contains KUp then [Forward]
     elif k.Contains KDown then [Right; Right; Forward]
     else []

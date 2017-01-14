@@ -179,7 +179,8 @@ let setupNewLevel (stage : Container) =
     stage.removeChildren() |> ignore
     levelCount <- levelCount + 1
     let rec changeLevel() =
-        let l = Utils.randomPick Data.levels
+        let l = Data.levels.[levelIndex]
+        levelIndex <- (levelIndex + 1) % Data.levels.Length
         if l <> Scram.Map.currentLevel then
             Scram.Map.setLevel l
         else changeLevel()

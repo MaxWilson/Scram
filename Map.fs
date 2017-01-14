@@ -52,6 +52,7 @@ let treasure (stage: Container) (x, y) =
     stage.addChild(s)
     |> ignore
 
+let mutable levelIndex = 0
 let mutable currentLevel : TerrainMap = Unchecked.defaultof<TerrainMap>
 let setLevel lvl = currentLevel <- lvl
 

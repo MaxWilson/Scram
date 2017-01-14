@@ -125,16 +125,16 @@ type Robot(image: string, map: TerrainMap, computeInstructions: Robot -> Behavio
                         direction <- Direction.TurnRight direction
                         sp.rotation <- RotationAngle direction
                     | Forward ->
-                        let bound n = if n < 0 then 0 elif n > 9 then 9 else n
+                        let bound max n = if n < 0 then 0 elif n > max then max else n
                         match direction with
                         | Direction.Left ->
-                            n <- bound(n - 1)
+                            n <- bound (map.[m].Length) (n - 1)
                         | Direction.Right ->
-                            n <- bound(n + 1)
+                            n <- bound (map.[m].Length) (n + 1)
                         | Direction.Up ->
-                            m <- bound(m - 1)
+                            m <- bound (map.Length) (m - 1)
                         | Direction.Down ->
-                            m <- bound(m + 1)
+                            m <- bound (map.Length) (m + 1)
                         updateDest()
                     | _ -> ()
         else
@@ -178,13 +178,7 @@ let mutable levelCount = 0
 let setupNewLevel (stage : Container) =
     stage.removeChildren() |> ignore
     levelCount <- levelCount + 1
-    let rec changeLevel() =
-        let l = Data.levels.[levelIndex]
-        levelIndex <- (levelIndex + 1) % Data.levels.Length
-        if l <> Scram.Map.currentLevel then
-            Scram.Map.setLevel l
-        else changeLevel()
-    changeLevel()
+    Scram.Map.nextLevel()
     let lvl = Scram.Map.currentLevel
     robots <- [
                 Robot("aliancorn.png", lvl, alienBrain);

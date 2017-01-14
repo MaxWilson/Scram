@@ -11,7 +11,6 @@ open Utils
 
 let tilesize = 64.
 let top,left = 20., 20.
-let bottom,right = 20.+(tilesize*10.),20.+(tilesize*10.)
 
 type MoveableSprite() =
     inherit Sprite()
@@ -58,6 +57,8 @@ let setLevel lvl = currentLevel <- lvl
 
 let gr = Graphics()
 let renderLevel (stage: Container) (level : TerrainMap) =
+    let right, bottom = 20.+(tilesize*(level.Length|> float)),20.+(tilesize*(level |> Seq.map (fun r -> r.Length) |> Seq.max |> float))
+
     currentLevel <- level
     gr.beginFill(float 0xFFFFFF).lineStyle(3., float 0x000000)
         .drawRect(top, left, bottom-top, right-left)

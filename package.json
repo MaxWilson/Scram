@@ -21,7 +21,7 @@
   "devDependencies": {
     "core-js": "^2.4.1",
     "css-loader": "^0.26.1",
-    "fable-compiler": "^0.7.25",
+    "fable-compiler": "0.7.25",
     "fable-core": "^0.7.18",
     "fable-import-pixi": "0.0.10",
     "fable-import-react": "^0.5.2",
